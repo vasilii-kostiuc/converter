@@ -35,7 +35,7 @@ class Syncronization
     private $value;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="date")
      */
     private $syncronizedAt;
 

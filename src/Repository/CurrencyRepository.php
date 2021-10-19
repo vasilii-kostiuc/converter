@@ -47,4 +47,18 @@ class CurrencyRepository extends ServiceEntityRepository
         ;
     }
     */
+
+
+	public function findAllCodes()
+	{
+		$rows = $this->createQueryBuilder('c')
+			->select('c.code')
+			->getQuery()
+			->execute();
+
+		return array_map(function($row) {
+			return $row['code'];
+		}, $rows);
+	}
+
 }

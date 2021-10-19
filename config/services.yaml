@@ -23,3 +23,9 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Converter\ExchangeRatesClient:
+        arguments:
+            $apiUrl: 'http://api.exchangeratesapi.io/v1/'
+            $apiKey: '8052574594a1d67a1056180f709ab98a'
+
+    App\Converter\CurrencyExchangeInterface: '@App\Converter\ExchangeRatesClient'
