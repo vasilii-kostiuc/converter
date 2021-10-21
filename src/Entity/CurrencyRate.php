@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\SyncronizationRepository;
+use App\Repository\CurrencyRateRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=SyncronizationRepository::class)
+ * @ORM\Entity(repositoryClass=CurrencyRateRepository::class)
  */
-class Syncronization
+class CurrencyRate
 {
     /**
      * @ORM\Id
@@ -37,7 +37,7 @@ class Syncronization
     /**
      * @ORM\Column(type="date")
      */
-    private $syncronizedAt;
+    private $date;
 
     public function getId(): ?int
     {
@@ -80,14 +80,14 @@ class Syncronization
         return $this;
     }
 
-    public function getSyncronizedAt(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeInterface
     {
-        return $this->syncronizedAt;
+        return $this->date;
     }
 
-    public function setSyncronizedAt(\DateTimeInterface $syncronizedAt): self
+    public function setDate(\DateTimeInterface $date): self
     {
-        $this->syncronizedAt = $syncronizedAt;
+        $this->date = $date;
 
         return $this;
     }

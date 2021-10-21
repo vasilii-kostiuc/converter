@@ -9,9 +9,9 @@
 namespace App\Converter;
 
 
+use App\Entity\CurrencyRate;
 use App\Entity\Syncronization;
-use App\Repository\CurrencyRepository;
-use App\Repository\SyncronizationRepository;
+use App\Repository\CurrencyRateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CurrencyRatesSyncronizer {
@@ -20,43 +20,38 @@ class CurrencyRatesSyncronizer {
 
 	private EntityManagerInterface $entityManager;
 
-	private SyncronizationRepository $syncRepozitory;
+	private CurrencyRateRepository $currencyRateRepository;
 
-	private CurrencyRepository $currencyRepository;
-
-	private array $currencies;
-
-	public function __construct(CurrencyExchangeInterface $exchange, EntityManagerInterface $entityManager, SyncronizationRepository $syncRepository, CurrencyRepository $currencyRepository) {
+	public function __construct(CurrencyExchangeInterface $exchange, EntityManagerInterface $entityManager, CurrencyRateRepository $currencyRateRepository) {
 		$this->exchange = $exchange;
 		$this->entityManager = $entityManager;
-		$this->syncRepozitory = $syncRepository;
-		$this->currencyRepository = $currencyRepository;
+		$this->currencyRateRepository = $currencyRateRepository;
 	}
 
-	public function syncronize() {
-		$currencies = [];
-		foreach ($this->currencyRepository->findAll() as $currency) {
-			$currencies[$currency->getCode()] = $currency;
+	public function syncronize(array $currencies) {
+		$currenciesAssoc = [];
+		foreach ($currencies as $currency) {
+			$currenciesAssoc[$currency->getCode()] = $currency;
 		}
 
-		$currencyCodes = array_keys($currencies);
+		$currencyCodes = array_keys($currenciesAssoc);
 
 		foreach ($currencies as $currency) {
 			$symbols = array_diff($currencyCodes, [$currency->getCode()]);
 			$latestRates = $this->exchange->latest($currency->getCode(), $symbols);
-			$this->saveRates($latestRates, $currencies);
+			$this->saveRates($latestRates, $currenciesAssoc);
 		}
 	}
 
-	private function saveRates(array $rates, array $currencies) {
+	private function saveRates(array $rates, array $currenciesAssoc) {
 		foreach ($rates['rates'] as $currencyCode => $value) {
-			$sync = new Syncronization();
-			$sync->setFromCurrency($currencies[$rates['base']]);
-			$sync->setToCurrency($currencies[$currencyCode]);
-			$sync->setValue($value);
-			$sync->setSyncronizedAt(new \DateTime($rates['date']));
+			$currRate = new CurrencyRate();
+			$currRate->setFromCurrency($currenciesAssoc[$rates['base']]);
+			$currRate->setToCurrency($currenciesAssoc[$currencyCode]);
+			$currRate->setValue($value);
+			$currRate->setDate(new \DateTime($rates['date']));
 
-			$this->entityManager->persist($sync);
+			$this->entityManager->persist($currRate);
 		}
 		$this->entityManager->flush();
 	}

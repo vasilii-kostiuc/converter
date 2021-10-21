@@ -22,7 +22,9 @@ class ExchangeRatesClient implements CurrencyExchangeInterface {
 
 	public function latest(string $base, array $symbols) {
 		$latestRates = [];
+
 		$response = $this->request('latest', ['base' => $base, 'symbols' => implode(',', $symbols)]);
+
 		$latestRates['date'] = $response['date'];
 		$latestRates['base'] = $response['base'];
 		$latestRates['rates'] = $response['rates'];
@@ -39,8 +41,8 @@ class ExchangeRatesClient implements CurrencyExchangeInterface {
 		$json = curl_exec($ch);
 		curl_close($ch);
 		$response = json_decode($json, true);
-dump($response);
-		if (!$response['success']) {
+		dump($response);
+		if ($response['error']) {
 			throw new \Exception($response['error']['info']);
 		}
 

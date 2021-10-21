@@ -12,3 +12,51 @@ import './styles/app.scss';
 import './bootstrap';
 
 import 'bootstrap';
+
+import axios from 'axios';
+
+import Vue from 'vue';
+
+
+var converter = new Vue({
+    el: '#converter-app',
+    data: {
+        message: 'Вы загрузили эту страницу: ' + new Date().toLocaleString(),
+        from: 0,
+        to: 0,
+        currency_from: 'USD',
+        currency_to: 'USD',
+        date: '',
+        currencyRatesMap: []
+    },
+    created: function () {
+        axios
+            .get('/currencies_map')
+            .then(response => {
+                this.currencyRatesMap = response.data;
+            });
+
+    },
+    watch: {
+        from: function (newFrom, oldFrom) {
+            this.convert();
+        },
+        currency_from: function (newFrom, oldFrom) {
+            this.convert();
+        },
+        currency_to: function (newFrom, oldFrom) {
+            this.convert();
+        }
+    },
+
+    methods: {
+        convert: function () {
+            if (this.currency_from == this.currency_to) {
+                this.to = this.from;
+            } else {
+                this.to = (this.from * this.currencyRatesMap[this.currency_from][this.currency_to]['value']).toFixed(2);
+                this.date = this.currencyRatesMap[this.currency_from][this.currency_to]['date'];
+            }
+        }
+    }
+});
